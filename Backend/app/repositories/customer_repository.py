@@ -14,6 +14,9 @@ def get_all_customers(db: Session):
 def get_by_id(db: Session, customer_id: str):
     return db.query(Customer).filter(Customer.id == customer_id).first()
 
+def get_by_email(db: Session, customer_email: str):
+    return db.query(Customer).filter(Customer.email == customer_email).first()
+
 def update_customer(db: Session, customer, update_data):
     for key, value in update_data.dict().items():
         setattr(customer, key, value)
