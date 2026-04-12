@@ -12,12 +12,13 @@ class Activity(Base):
     title = Column(String, nullable = False)
     description = Column(String, nullable = True)
 
-    type = Column(Enum(ActivityType), nullable = False)
+    type = Column(Enum(ActivityType), nullable = False, default = ActivityType.CALL)
     status = Column(Enum(ActivityStatus), default = ActivityStatus.PENDING)
 
     due_date = Column(DateTime, nullable = True)
 
     customer_id = Column(String, ForeignKey("customers.id"), nullable = True)
     opportunity_id = Column(String, ForeignKey("opportunities.id"), nullable = True)
+    owner_id = Column(String, ForeignKey("users.id"))
 
     created_at = Column(DateTime, default = datetime.utcnow())

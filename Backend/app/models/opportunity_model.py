@@ -10,6 +10,7 @@ class Opportunity(Base):
     id = Column(String, primary_key = True, default = lambda: str(uuid.uuid4()))
     title = Column(String, nullable = False)
     status = Column(Enum(OpportunityStatus), default = OpportunityStatus.LEAD)
-    value = Column(Float, nullable = False)
+    value = Column(Float, nullable = False, default = 0)
 
     customer_id = Column(String, ForeignKey("customers.id"), nullable = False)
+    owner_id = Column(String, ForeignKey("users.id"))

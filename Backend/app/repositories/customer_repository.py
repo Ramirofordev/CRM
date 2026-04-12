@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.customer_model import Customer
 
 def create_customer(db: Session, customer_data):
-    customer = Customer(**customer_data.dict())
+    customer = Customer(**customer_data)
     db.add(customer)
     db.commit()
     db.refresh(customer)
@@ -16,6 +16,9 @@ def get_by_id(db: Session, customer_id: str):
 
 def get_by_email(db: Session, customer_email: str):
     return db.query(Customer).filter(Customer.email == customer_email).first()
+
+def get_by_owner(db: Session, owner_id: str):
+    return db.query(Customer).filter(Customer.owner_id == owner_id).all()
 
 def update_customer(db: Session, customer, update_data):
     for key, value in update_data.dict().items():

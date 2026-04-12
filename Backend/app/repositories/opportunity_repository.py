@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from app.models.opportunity_model import Opportunity
 
 def create_opportunity(db: Session, data):
-    opportunity = Opportunity(**data.dict())
+    opportunity = Opportunity(**data)
     db.add(opportunity)
     db.commit()
 
@@ -14,6 +14,9 @@ def get_all_opportunities(db: Session):
 
 def get_by_id(db: Session, opportunity_id: str):
     return db.query(Opportunity).filter(Opportunity.id == opportunity_id).first()
+
+def get_by_owner(db: Session, owner_id: str):
+    return db.query(Opportunity).filter(Opportunity.owner_id == owner_id).all()
 
 def update_opportunity(db: Session, opportunity, data):
     for key, value in data.dict().items():

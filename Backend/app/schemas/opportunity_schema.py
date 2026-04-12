@@ -1,9 +1,9 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from app.enum.opportunities_status import OpportunityStatus
 
 class OpportunityCreate(BaseModel):
     title: str
-    value: float
+    value: float | None = 0
     customer_id: str
 
 
@@ -11,11 +11,11 @@ class OpportunityResponse(BaseModel):
     id: str
     title: str
     status: OpportunityStatus
-    value: float
+    value: float | None = 0
     customer_id: str
+    owner_id: str
 
-    class Config:
-        form_attributes: True
+    model_config = ConfigDict(from_attributes = True)
 
 class OpportunityStatusUpdate(BaseModel):
     status: OpportunityStatus

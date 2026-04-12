@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.dialects.sqlite import BLOB
 import uuid
 
@@ -12,3 +12,5 @@ class Customer(Base):
     email = Column(String, nullable = False)
     phone = Column(String, nullable = True)
     address = Column(String, nullable = True) 
+
+    owner_id = Column(String, ForeignKey("users.id"))

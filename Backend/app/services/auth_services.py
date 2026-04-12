@@ -21,9 +21,16 @@ def login_user(db: Session, data):
     if not user:
         raise HTTPException(status_code = 401, detail = "Invalid credentials")
     
-    if not verify_password(data.password == user.password):
+    if not verify_password(data.password, user.password):
         raise HTTPException(status_code = 401, detail = "Invalid credentials")
     
     token = create_access_token({"sub": user.id})
     
     return {"access_token": token, "token_type": "bearer"}
+
+def check_ownership(resource, user):
+    if user.role == "admin":
+        return True
+    
+    if resource.owner_id != user.id:
+        raise HTTPException(status_code = 403, detail = "Not authorized")
