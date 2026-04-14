@@ -6,7 +6,7 @@ from app.services import customer_services
 from app.core.deps import get_current_user
 from app.db.deps import get_db
 
-router = APIRouter(prefix = "/customers", tags = ["Customers"], dependencies = [Depends(get_current_user)])
+router = APIRouter(prefix = "/customers", tags = ["Customers"])
 
 @router.post("/", response_model = CustomerResponse, status_code = 201)
 def create_customer(customer: CustomerCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):

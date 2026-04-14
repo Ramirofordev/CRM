@@ -24,9 +24,7 @@ def create_activity(db: Session, data, user):
         if not opportunity:
             raise HTTPException(status_code = 404, detail = "Opportunity not found")
         
-        if opportunity.owner_id != user.id:
-            raise HTTPException(status_code = 403, detail = "Not authorized")
-        
+    
         check_ownership(opportunity, user)
         
     data_dict = data.model_dump()

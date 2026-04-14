@@ -6,7 +6,7 @@ from app.services import opportunity_services
 from app.core.deps import get_current_user
 from app.db.deps import get_db
 
-router = APIRouter(prefix = "/opportunities", tags = ["Opportunities"], dependencies = [Depends(get_current_user)])
+router = APIRouter(prefix = "/opportunities", tags = ["Opportunities"])
 
 @router.post("/", response_model = OpportunityResponse, status_code = 201)
 def create_opportunity(data: OpportunityCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):

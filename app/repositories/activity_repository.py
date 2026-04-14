@@ -10,7 +10,7 @@ def create_activity(db: Session, data):
     return activity
 
 def get_all_activities(db: Session):
-    return db.query(Activity)
+    return db.query(Activity).all()
 
 def get_by_id(db: Session, activity_id: str):
     return db.query (Activity).filter(Activity.id == activity_id).first()

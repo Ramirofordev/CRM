@@ -6,7 +6,7 @@ from app.services import activity_services
 from app.core.deps import get_current_user
 from app.db.deps import get_db
 
-router = APIRouter(prefix = "/activities", tags = ["Activities"], dependencies = [Depends(get_current_user)])
+router = APIRouter(prefix = "/activities", tags = ["Activities"])
 
 @router.post("/", response_model = ActivityResponse, status_code = 201)
 def create_activity(data: ActivityCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):
