@@ -18,10 +18,14 @@ def normalize_password(password: str) -> str:
     return hashlib.sha256(password.encode()).hexdigest()
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(normalize_password(password))
+    normalized = normalize_password(password)
+    normalized = normalized[:72]
+    return pwd_context.hash(normalized)
 
 def verify_password(password: str, hashed: str) -> bool:
-    return pwd_context.verify(normalize_password(password), hashed)
+    normalized = normalize_password(password)
+    normalized = normalized[:72]
+    return pwd_context.verify(normalized, hashed)
 
 def create_access_token(data: dict):
     to_encode = data.copy()
