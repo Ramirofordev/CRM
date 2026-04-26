@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from app.schemas.activity_schema import ActivityCreate, ActivityResponse
+from app.schemas.activity_schema import ActivityCreate, ActivityResponse, ActivityStatusUpdate
 from app.services import activity_services
 from app.core.deps import get_current_user
 from app.db.deps import get_db
@@ -31,6 +31,10 @@ def get_activity(activity_id: str, db: Session = Depends(get_db), user = Depends
 @router.put("/{activity_id}", response_model = ActivityResponse)
 def update_activity(activity_id: str, data: ActivityCreate, db: Session = Depends(get_db), user = Depends(get_current_user)):
     return activity_services.update_activity(db, activity_id, data, user)
+
+@router.patch("/{activity_id}/status", response_model = ActivityResponse)
+def change_status(activity_id: str, data: ActivityStatusUpdateº, db: Session = Depends(get_db), user = Depends(get_current_user)):
+    return activity_services.update_status(db, activity_id, data.status, user)
 
 @router.delete("/{activity_id}")
 def delete_activity(activity_id: str, db: Session = Depends(get_db), user = Depends(get_current_user)):

@@ -29,3 +29,6 @@ class ActivityResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class ActivityStatusUpdate(BaseModel):
+    status: ActivityStatus

@@ -83,6 +83,22 @@ def update_activity(db: Session, activity_id: str, data, user):
 
     return activity_repository.update_activity(db, activity, data)
 
+def update_status(db: Session, activity_id: str, new_status: ActivityStatus, user):
+    activity = activity_repository.get_by_id(db, activity_id)
+
+    if not activity:
+        raise HTTPException(status_code = 404, detail = "Activity not found")
+
+    check_ownership(activity, user)
+
+    current_status = activity.status
+
+    activity.status = new_status
+    db.commit()
+    db.refresh(activity)
+
+    return activity
+
 def delete_activity(db: Session, activity_id: str, user):
     activity = activity_repository.get_by_id(db, activity_id)
 
