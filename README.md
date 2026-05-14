@@ -219,16 +219,16 @@ Variables de entorno del backend:
 
 ```env
 ENV=production
-DATABASE_URL=postgresql://postgres:<password>@<supabase-host>:5432/postgres
+DATABASE_URL=postgresql://postgres:<password>@db.sidahfffffhvtahdtajp.supabase.co:5432/postgres
 SECRET_KEY=<strong-random-secret>
-CORS_ORIGINS=https://<frontend-domain>
+CORS_ORIGINS=https://project-crm.vercel.app
 SKIP_CREATE_ALL=1
 ```
 
 Variables de entorno del frontend:
 
 ```env
-VITE_API_URL=https://<backend-domain>
+VITE_API_URL=https://project-crm-api.onrender.com
 ```
 
 El comando de arranque de producción ejecuta las migraciones antes de levantar la API:
