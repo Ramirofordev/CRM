@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Customers from "./pages/Customers";
@@ -6,10 +7,6 @@ import Opportunities from "./pages/Opportunities";
 import Activities from "./pages/Activities";
 import MainLayout from "./layout/MainLayout";
 import ProtectedRoute from "./routes/ProtectedRoute";
-
-function Dashboard() {
-  return <h1>Dashboard</h1>;
-}
 
 function App() {
   return (
@@ -60,6 +57,17 @@ function App() {
             <ProtectedRoute>
               <MainLayout>
                 <Activities />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path = "/dashboard"
+          element = {
+            <ProtectedRoute>
+              <MainLayout>
+                <Dashboard />
               </MainLayout>
             </ProtectedRoute>
           }

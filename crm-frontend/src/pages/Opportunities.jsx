@@ -1,15 +1,22 @@
 import { useEffect, useState } from "react";
-import API from "../api/client";
+import { opportunitiesApi } from "../api/resources";
+import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
+import { GripVertical, Plus } from "lucide-react";
+import Badge from "../components/ui/Badge";
+import Button from "../components/ui/Button";
+import PageHeader from "../components/ui/PageHeader";
+import Panel from "../components/ui/Panel";
 import CreateOpportunityModal from "../components/CreateOpportunityModal.jsx";
 import EditOpportunityModal from "../components/EditOpportunityModal.jsx";
 
-import {
-    DndContext,
-    useDraggable,
-    useDroppable,
-} from "@dnd-kit/core";
-
 const stages = ["LEAD", "CONTACTED", "PROPOSAL", "WON", "LOST"];
+const stageVariant = {
+    LEAD: "blue",
+    CONTACTED: "violet",
+    PROPOSAL: "amber",
+    WON: "green",
+    LOST: "rose",
+};
 
 export default function Opportunities() {
     const [opportunities, setOpportunities] = useState([]);
@@ -18,7 +25,7 @@ export default function Opportunities() {
 
     const fetchData = async () => {
         try {
-            const res = await API.get("/opportunities/");
+            const res = await opportunitiesApi.list();
             setOpportunities(res.data);
         } catch (err) {
             console.error(err);
@@ -28,7 +35,7 @@ export default function Opportunities() {
     const handleDelete = async (id) => {
         if (!confirm("Eliminar oportunidad?")) return;
 
-        await API.delete(`/opportunities/${id}`);
+        await opportunitiesApi.remove(id);
         fetchData();
     };
 
@@ -42,23 +49,16 @@ export default function Opportunities() {
         };
 
         const { active, over } = event;
-        
         if (!over) return;
 
         const opportunityId = active.id;
         const newStatus = over.id;
-
         const opportunity = opportunities.find(o => o.id === opportunityId);
-        const currentStatus = opportunity.status
+        const currentStatus = opportunity?.status;
 
-        if (!currentStatus) return ;
-
-        if (allowedTransitions[currentStatus].includes(newStatus)) {
+        if (currentStatus && allowedTransitions[currentStatus].includes(newStatus)) {
             try {
-                await API.patch(`/opportunities/${opportunityId}/status`, {
-                    status: newStatus,
-                });
-
+                await opportunitiesApi.updateStatus(opportunityId, newStatus);
                 fetchData();
             } catch (err) {
                 console.error(err);
@@ -66,115 +66,99 @@ export default function Opportunities() {
         }
     };
 
-    const handleEdit = (opportunity) => {
-        setSelectedOpportunity(opportunity);
-    };
-
     useEffect(() => {
-        fetchData();
+        let active = true;
+
+        opportunitiesApi.list()
+            .then((res) => {
+                if (active) setOpportunities(res.data);
+            })
+            .catch((err) => console.error(err));
+
+        return () => {
+            active = false;
+        };
     }, []);
 
     return (
-        <div>
-            <h1 className = "text-2xl font-bold mb-6">Pipeline</h1>
-
-            <button
-                onClick = {() => setShowModal(true)}
-                className = "mb-4 bg-blue-500 px-4 py-2 rounded"
-            >
-                + Nueva oportunidad
-            </button>
+        <div className = "mx-auto max-w-[1500px] space-y-8">
+            <PageHeader
+                title = "Pipeline"
+                description = "Mueve oportunidades por etapa y mantén el forecast comercial bajo control."
+                action = {
+                    <Button onClick = {() => setShowModal(true)}>
+                        <Plus size = {18} /> Nueva oportunidad
+                    </Button>
+                }
+            />
 
             <DndContext onDragEnd = {handleDragEnd}>
-                <div className = "grid grid-cols-5 gap-4">
-                    {stages.map((stage) => (
-                        <Column key = {stage} stage = {stage}>
-                            {opportunities
-                                .filter((o) => o.status === stage)
-                                .map((o) => (
-                                    <OpportunityCard key = {o.id} opportunity = {o} onDelete = {handleDelete} onEdit = {handleEdit}>
-                                        
-                                    </OpportunityCard>
-                            ))}
-                        </Column>                        
-                    ))}
+                <div className = "grid gap-4 overflow-x-auto pb-3 lg:grid-cols-5">
+                    {stages.map((stage) => {
+                        const items = opportunities.filter((o) => o.status === stage);
+
+                        return (
+                            <Column key = {stage} stage = {stage} count = {items.length}>
+                                {items.map((opportunity) => (
+                                    <OpportunityCard
+                                        key = {opportunity.id}
+                                        opportunity = {opportunity}
+                                        onDelete = {handleDelete}
+                                        onEdit = {setSelectedOpportunity}
+                                    />
+                                ))}
+                            </Column>
+                        );
+                    })}
                 </div>
             </DndContext>
 
-            {showModal && (
-                <CreateOpportunityModal
-                    onClose={() => setShowModal(false)}
-                    onCreated={fetchData}
-                />
-            )}
-
-            {/* Show edit modal*/}
-            {selectedOpportunity && (
-                <EditOpportunityModal
-                    opportunity = {selectedOpportunity}
-                    onClose={() => setSelectedOpportunity(null)}
-                    onUpdated = {fetchData}
-                />
-            )}
+            {showModal && <CreateOpportunityModal onClose = {() => setShowModal(false)} onCreated = {fetchData} />}
+            {selectedOpportunity && <EditOpportunityModal opportunity = {selectedOpportunity} onClose = {() => setSelectedOpportunity(null)} onUpdated = {fetchData} />}
         </div>
     );
 }
 
 function OpportunityCard({ opportunity, onDelete, onEdit }) {
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({
-        id: opportunity.id,
-    });
-
-    const style = transform
-    ? {
-        transform: `translate(${transform.x}px, ${transform.y}px)`,
-    }
-    : undefined;
+    const { attributes, listeners, setNodeRef, transform } = useDraggable({ id: opportunity.id });
+    const style = transform ? { transform: `translate(${transform.x}px, ${transform.y}px)` } : undefined;
 
     return (
-        <div 
-            ref = {setNodeRef}
-            style = {style}
-            className = "bg-slate-800 p-3 rounded"
-        >
+        <Panel className = "p-4" ref = {undefined}>
+            <div ref = {setNodeRef} style = {style}>
+                <div {...listeners} {...attributes} className = "mb-4 flex cursor-grab items-start justify-between gap-3">
+                    <div>
+                        <p className = "font-bold text-slate-950 dark:text-white">{opportunity.title}</p>
+                        <p className = "mt-1 text-sm text-slate-500 dark:text-slate-400">{Number(opportunity.value || 0).toLocaleString("es-ES")}€</p>
+                    </div>
+                    <GripVertical className = "text-slate-400" size = {18} />
+                </div>
 
-            {/* DRAG HANDLE*/}
-            <div 
-                {...listeners}
-                {...attributes}
-                className = "cursor-grab mb-2 flex justify-between items-center"
-            >
+                <div className = "mb-4">
+                    <Badge variant = {stageVariant[opportunity.status]}>{opportunity.status}</Badge>
+                </div>
 
-                <span>{opportunity.title}</span>
-                <span className="text-xs text-slate-400">{opportunity.value}€</span>
-
+                <div className = "flex gap-2">
+                    <Button variant = "secondary" className = "flex-1 px-3 py-2" onClick = {() => onEdit(opportunity)}>Editar</Button>
+                    <Button variant = "danger" className = "flex-1 px-3 py-2" onClick = {() => onDelete(opportunity.id)}>Eliminar</Button>
+                </div>
             </div>
-            <button
-                    onClick = {() => onEdit(opportunity)}
-                    className = "bg-yellow-500 px-3 py-1 rounded text-sm p-2 flex flex-row gap-2"
-                >
-                    Editar
-            </button>
-
-            <button 
-                onClick = {() => onDelete(opportunity.id)}
-                className = "bg-red-500 px-3 py-1 rounded text-sm p-2 flex flex-row gap-2"
-                >
-                    Eliminar
-            </button>
-        </div>
+        </Panel>
     );
 }
 
-function Column({ stage, children }) {
-    const { setNodeRef } = useDroppable({
-        id: stage,
-    });
+function Column({ stage, count, children }) {
+    const { setNodeRef } = useDroppable({ id: stage });
 
     return (
-        <div ref = {setNodeRef} className = "bg-slate-900 p-3 rounded-xl">
-            <h2 className = "text-sm text-slate-400 mb-3">{stage}</h2>
-            <div className = "flex flex-col gap-2">{children}</div>
+        <div ref = {setNodeRef} className = "min-h-[420px] min-w-[280px] rounded-3xl border border-slate-200/80 bg-white/55 p-4 backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/35">
+            <div className = "mb-4 flex items-center justify-between">
+                <Badge variant = {stageVariant[stage]}>{stage}</Badge>
+                <span className = "rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-500 dark:bg-white/10 dark:text-slate-300">{count}</span>
+            </div>
+            <div className = "flex flex-col gap-3">
+                {count === 0 ? <p className = "rounded-2xl border border-dashed border-slate-200 p-4 text-center text-sm text-slate-400 dark:border-white/10">Sin oportunidades</p> : children}
+            </div>
         </div>
     );
 }

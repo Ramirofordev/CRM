@@ -17,11 +17,14 @@ def get_by_id(db: Session, customer_id: str):
 def get_by_email(db: Session, customer_email: str):
     return db.query(Customer).filter(Customer.email == customer_email).first()
 
+def get_by_email_and_owner(db: Session, customer_email: str, owner_id: str):
+    return db.query(Customer).filter(Customer.email == customer_email, Customer.owner_id == owner_id).first()
+
 def get_by_owner(db: Session, owner_id: str):
     return db.query(Customer).filter(Customer.owner_id == owner_id).all()
 
 def update_customer(db: Session, customer, update_data):
-    for key, value in update_data.dict().items():
+    for key, value in update_data.model_dump().items():
         setattr(customer, key, value)
 
     db.commit()

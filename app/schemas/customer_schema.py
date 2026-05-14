@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 class CustomerCreate(BaseModel):
@@ -14,5 +14,4 @@ class CustomerResponse(BaseModel):
     phone: Optional[str] 
     address: Optional[str]
 
-class Config:
-    form_attributes = True
+    model_config = ConfigDict(from_attributes = True)

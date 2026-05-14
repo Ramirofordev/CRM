@@ -25,7 +25,7 @@ def get_by_owner(db: Session, owner_id: str):
     return db.query(Activity).filter(Activity.owner_id == owner_id).all()
 
 def update_activity(db: Session, activity, data):
-    for key, value in data.dict().items():
+    for key, value in data.model_dump().items():
         setattr(activity, key, value)
 
     db.commit()

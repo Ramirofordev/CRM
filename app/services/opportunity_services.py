@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.repositories import opportunity_repository, customer_repository
 from app.enum.opportunities_status import OpportunityStatus
-from app.services.auth_services import check_ownership
+from app.services.authorization_services import check_ownership
 
 def create_opportunity(db: Session, data, user):
     customer = customer_repository.get_by_id(db, data.customer_id)

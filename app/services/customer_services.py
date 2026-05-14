@@ -2,10 +2,10 @@ from sqlalchemy.orm import Session
 from app.repositories import customer_repository
 from fastapi import HTTPException
 
-from app.services.auth_services import check_ownership
+from app.services.authorization_services import check_ownership
 
 def create_customer(db: Session, customer_data, user):
-    existing = customer_repository.get_by_email(db, customer_data.email)
+    existing = customer_repository.get_by_email_and_owner(db, customer_data.email, user.id)
 
     if existing:
         raise HTTPException(status_code = 400, detail = "Email already exists")

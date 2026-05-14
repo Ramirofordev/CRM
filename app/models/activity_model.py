@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, DateTime, ForeignKey, Enum
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.db.base import Base
 from app.enum.activity_enum import ActivityStatus, ActivityType
@@ -21,4 +21,4 @@ class Activity(Base):
     opportunity_id = Column(String, ForeignKey("opportunities.id"), nullable = True)
     owner_id = Column(String, ForeignKey("users.id"))
 
-    created_at = Column(DateTime, default = datetime.utcnow())
+    created_at = Column(DateTime, default = lambda: datetime.now(timezone.utc))
