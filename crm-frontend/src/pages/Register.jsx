@@ -16,8 +16,8 @@ export default function Register() {
             await authApi.register({ email, password });
             alert("Usuario creado");
             navigate("/login");
-        } catch {
-            alert("Error al registrarse");
+        } catch (error) {
+            alert(error.response?.data?.detail || "Error al registrarse");
         }
     };
 
