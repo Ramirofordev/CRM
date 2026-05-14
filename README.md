@@ -86,7 +86,7 @@ Backend (`.env` en la raíz):
 DATABASE_URL=sqlite:///./crm.db
 SECRET_KEY=change-me
 CORS_ORIGINS=http://localhost:5173
-# CORS_ORIGIN_REGEX=^https://project-[a-z0-9-]+-kuro-nacho-ramiro\.vercel\.app$
+# CORS_ORIGIN_REGEX=^https://(project-crm-[a-z0-9-]+|project-[a-z0-9-]+-kuro-nacho-ramiro)\.vercel\.app$
 ENV=development
 ```
 
@@ -224,7 +224,7 @@ ENV=production
 DATABASE_URL=postgresql://postgres:<password>@db.sidahfffffhvtahdtajp.supabase.co:5432/postgres
 SECRET_KEY=<strong-random-secret>
 CORS_ORIGINS=https://project-crm.vercel.app
-CORS_ORIGIN_REGEX=^https://project-[a-z0-9-]+-kuro-nacho-ramiro\.vercel\.app$
+CORS_ORIGIN_REGEX=^https://(project-crm-[a-z0-9-]+|project-[a-z0-9-]+-kuro-nacho-ramiro)\.vercel\.app$
 SKIP_CREATE_ALL=1
 ```
 
