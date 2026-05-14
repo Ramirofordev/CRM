@@ -86,6 +86,7 @@ Backend (`.env` en la raíz):
 DATABASE_URL=sqlite:///./crm.db
 SECRET_KEY=change-me
 CORS_ORIGINS=http://localhost:5173
+# CORS_ORIGIN_REGEX=^https://project-[a-z0-9-]+-kuro-nacho-ramiro\.vercel\.app$
 ENV=development
 ```
 
@@ -94,6 +95,7 @@ Notas:
 - Si `DATABASE_URL` no está definido, usa `sqlite:///./crm.db`.
 - En producción, `SECRET_KEY` debe estar definido.
 - `CORS_ORIGINS` acepta varios origins separados por coma.
+- `CORS_ORIGIN_REGEX` permite habilitar previews de Vercel sin usar `*`.
 - `SKIP_CREATE_ALL=1` desactiva `Base.metadata.create_all()` al importar `app.main`.
 
 Frontend (`crm-frontend/.env`):
@@ -222,6 +224,7 @@ ENV=production
 DATABASE_URL=postgresql://postgres:<password>@db.sidahfffffhvtahdtajp.supabase.co:5432/postgres
 SECRET_KEY=<strong-random-secret>
 CORS_ORIGINS=https://project-crm.vercel.app
+CORS_ORIGIN_REGEX=^https://project-[a-z0-9-]+-kuro-nacho-ramiro\.vercel\.app$
 SKIP_CREATE_ALL=1
 ```
 

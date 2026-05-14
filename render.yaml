@@ -13,6 +13,8 @@ services:
         value: "1"
       - key: CORS_ORIGINS
         value: https://project-crm.vercel.app
+      - key: CORS_ORIGIN_REGEX
+        value: ^https://project-[a-z0-9-]+-kuro-nacho-ramiro\.vercel\.app$
       - key: DATABASE_URL
         sync: false
       - key: SECRET_KEY

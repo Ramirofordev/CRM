@@ -16,6 +16,7 @@ class Settings:
             for origin in os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
             if origin.strip()
         ]
+        self.cors_origin_regex = os.getenv("CORS_ORIGIN_REGEX") or None
         self.skip_create_all = os.getenv("SKIP_CREATE_ALL") == "1" or self.env == "production"
 
     def validate(self):
