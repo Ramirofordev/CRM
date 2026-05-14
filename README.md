@@ -205,5 +205,36 @@ Activities:
 - Mejorar responsive y accesibilidad de modales/tablas.
 - Añadir fixtures de test con base aislada.
 - Añadir manejo visual de errores en frontend en lugar de `alert`/`confirm`.
-- Preparar migraciones con Alembic cuando el modelo de datos se estabilice.
 - Añadir paginación/filtros para clientes, oportunidades y actividades.
+
+## Producción
+
+Stack recomendado sin costo inicial:
+
+- Frontend: Vercel o Netlify.
+- Backend: Render o Koyeb.
+- Base de datos: Supabase PostgreSQL.
+
+Variables de entorno del backend:
+
+```env
+ENV=production
+DATABASE_URL=postgresql://postgres:<password>@<supabase-host>:5432/postgres
+SECRET_KEY=<strong-random-secret>
+CORS_ORIGINS=https://<frontend-domain>
+SKIP_CREATE_ALL=1
+```
+
+Variables de entorno del frontend:
+
+```env
+VITE_API_URL=https://<backend-domain>
+```
+
+El comando de arranque de producción ejecuta las migraciones antes de levantar la API:
+
+```bash
+alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+El endpoint `GET /health` permite validar que la API este activa.

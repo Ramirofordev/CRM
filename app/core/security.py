@@ -1,19 +1,12 @@
 from datetime import datetime, timedelta, timezone
 from jose import jwt
 import hashlib
-import os
 from passlib.context import CryptContext
-from dotenv import load_dotenv
 
-load_dotenv()
+from app.core.config import get_settings
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-
-if os.getenv("ENV") == "production" and not SECRET_KEY:
-    raise ValueError("SECRET_KEY not set")
-
-if not SECRET_KEY:
-    SECRET_KEY = "testsecretkey"
+settings = get_settings()
+SECRET_KEY = settings.secret_key
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
