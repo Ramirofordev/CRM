@@ -26,6 +26,12 @@ class Settings:
         if not self.secret_key:
             self.secret_key = "testsecretkey"
 
+    @property
+    def database_connect_args(self):
+        if self.database_url.startswith(("postgresql://", "postgresql+psycopg2://")):
+            return {"sslmode": "require"}
+        return {}
+
 
 @lru_cache
 def get_settings():

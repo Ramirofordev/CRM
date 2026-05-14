@@ -7,6 +7,10 @@ settings = get_settings()
 
 DATABASE_URL = settings.database_url
 
-engine = create_engine(DATABASE_URL, pool_pre_ping = True)
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping = True,
+    connect_args = settings.database_connect_args,
+)
 
 SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = engine)
