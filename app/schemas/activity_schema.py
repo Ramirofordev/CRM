@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -7,7 +7,7 @@ from app.enum.activity_enum import ActivityType, ActivityStatus
 class ActivityCreate(BaseModel):
     title: str
     description: Optional[str] = None
-    status: ActivityStatus | None = None
+    status: ActivityStatus | None = ActivityStatus.PENDING
     type: ActivityType | None = ActivityType.CALL
     due_date: Optional[datetime] = None
 
@@ -24,11 +24,9 @@ class ActivityResponse(BaseModel):
 
     customer_id: Optional[str] = None
     opportunity_id: Optional[str] = None
+    created_at: Optional[datetime] = None
 
-    
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes = True)
 
 class ActivityStatusUpdate(BaseModel):
     status: ActivityStatus

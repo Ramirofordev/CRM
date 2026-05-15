@@ -27,10 +27,3 @@ def login_user(db: Session, data):
     token = create_access_token({"sub": str(user.id)})
     
     return {"access_token": token, "token_type": "bearer"}
-
-def check_ownership(resource, user):
-    if user.role == "admin":
-        return True
-    
-    if resource.owner_id != user.id:
-        raise HTTPException(status_code = 403, detail = "Not authorized")

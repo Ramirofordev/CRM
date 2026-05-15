@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.repositories import activity_repository, customer_repository, opportunity_repository
-from app.services.auth_services import check_ownership
+from app.services.authorization_services import check_ownership
 from app.enum.activity_enum import ActivityStatus
 
 def create_activity(db: Session, data, user):
@@ -28,7 +28,7 @@ def create_activity(db: Session, data, user):
     
         check_ownership(opportunity, user)
         
-    data_dict = data.model_dump()
+    data_dict = data.model_dump(exclude_none = True)
     data_dict["owner_id"] = user.id
         
     return activity_repository.create_activity(db, data_dict)

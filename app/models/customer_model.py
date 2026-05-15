@@ -1,5 +1,4 @@
 from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.dialects.sqlite import BLOB
 import uuid
 
 from app.db.base import Base

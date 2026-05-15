@@ -1,10 +1,16 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import os
+from app.core.config import get_settings
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./crm.db")
+settings = get_settings()
 
-engine = create_engine(DATABASE_URL, pool_pre_ping = True)
+DATABASE_URL = settings.database_url
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping = True,
+    connect_args = settings.database_connect_args,
+)
 
 SessionLocal = sessionmaker(autocommit = False, autoflush = False, bind = engine)

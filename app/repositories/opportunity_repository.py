@@ -19,7 +19,7 @@ def get_by_owner(db: Session, owner_id: str):
     return db.query(Opportunity).filter(Opportunity.owner_id == owner_id).all()
 
 def update_opportunity(db: Session, opportunity, data):
-    for key, value in data.dict().items():
+    for key, value in data.model_dump().items():
         setattr(opportunity, key, value)
 
     db.commit()

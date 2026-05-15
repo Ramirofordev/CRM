@@ -42,6 +42,21 @@ def test_user_cannot_access_other_activity():
 
     assert res.status_code == 403
 
+def test_create_activity_defaults_to_pending_status():
+    email = get_email()
+    create_user(email, "123")
+    token = login_user(email, "123")
+
+    opportunity_id = create_opportunity_for_user(token)
+
+    res = client.post("/activities/", json = {
+        "title": "Call",
+        "opportunity_id": opportunity_id
+    }, headers = auth_headers(token))
+
+    assert res.status_code == 201
+    assert res.json()["status"] == "PENDING"
+
 def test_user_only_sees_own_activities():
     # User A
     email_a = get_email()

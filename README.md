@@ -1,305 +1,243 @@
-# CRM Public API
+# CRM MVP
 
-## Overview
+CRM full stack en fase de desarrollo para gestionar clientes, oportunidades comerciales y actividades de seguimiento. El proyecto mantiene una arquitectura simple y extensible: backend con FastAPI y SQLAlchemy, frontend con React y Vite.
 
-This project is a **Customer Relationship Management (CRM) backend API** designed to manage customer data, sales opportunities, and business activities.
+## Visión General
 
-It follows a **clean, layered architecture** and applies best practices such as **separation of concerns, SOLID principles, and RESTful design**.
+El flujo principal del sistema es:
 
-The system is built as a **Minimum Viable Product (MVP)** with a focus on scalability, maintainability, and real-world applicability.
-
----
-
-## Objectives
-
-The main goal of this project is to support a typical sales workflow:
-
-```
-Customer → Opportunity → Activity → Deal Tracking
+```text
+Usuario -> Cliente -> Oportunidad -> Actividad -> Seguimiento comercial
 ```
 
-It enables users to:
+Funcionalidades actuales:
 
-* Manage customers
-* Track sales opportunities
-* Record activities (calls, meetings, tasks)
-* Maintain structured business data
+- Registro y login de usuarios con JWT.
+- Gestión de clientes por usuario.
+- Gestión de oportunidades vinculadas a clientes.
+- Pipeline de oportunidades con estados: `LEAD`, `CONTACTED`, `PROPOSAL`, `WON`, `LOST`.
+- Gestión de actividades vinculadas a cliente u oportunidad.
+- Dashboard frontend con métricas, actividades recientes y estado del pipeline.
+- Protección de datos por ownership: cada usuario solo accede a sus recursos.
 
----
+## Stack
 
-## Tech Stack
+Backend:
 
-### Backend
+- Python 3.11
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- JWT con `python-jose`
+- Pytest
 
-* **Python**
-* **FastAPI**
-* **SQLAlchemy (ORM)**
-* **PostgreSQL**
-* **Pydantic (validation)**
+Frontend:
 
-### Other Tools
+- React 19
+- Vite
+- React Router
+- Axios
+- Tailwind CSS
+- Recharts
+- Lucide React
+- dnd-kit
 
-* Pytest (testing)
-* JWT Authentication
-* Alembic (migrations - optional extension)
+## Estructura
 
----
+```text
+app/                     Backend FastAPI
+  controllers/           Rutas HTTP
+  services/              Reglas de negocio y autorización
+  repositories/          Acceso a base de datos
+  models/                Modelos SQLAlchemy
+  schemas/               DTOs Pydantic
+  core/                  Seguridad y dependencias
+  db/                    Sesión y base SQLAlchemy
 
-## Architecture
+tests/                   Tests backend con Pytest
 
-The system follows a **layered architecture pattern**:
-
-```
-Controller → Service → Repository → Database
-```
-
-### Layer Responsibilities
-
-* **Controllers**
-
-  * Handle HTTP requests and responses
-  * No business logic
-
-* **Services**
-
-  * Contain business logic
-  * Validate workflows and rules
-
-* **Repositories**
-
-  * Handle database operations (CRUD)
-
-* **Models**
-
-  * Represent database tables (SQLAlchemy)
-
-* **Schemas (DTOs)**
-
-  * Validate input/output (Pydantic)
-
----
-
-## System Architecture Diagram
-
-```mermaid
-flowchart TD
-
-    Client --> Controller
-    Controller --> Service
-    Service --> Repository
-    Repository --> Database[(PostgreSQL)]
-
-    subgraph Backend
-        Controller
-        Service
-        Repository
-        Models
-        Schemas
-    end
-
-    Service --> Models
-    Controller --> Schemas
+crm-frontend/            Frontend Vite React
+  src/api/               Cliente Axios y recursos API
+  src/components/        Componentes reutilizables
+  src/pages/             Pantallas principales
+  src/routes/            Rutas protegidas
+  src/layout/            Layout principal
 ```
 
----
+## Arquitectura Backend
 
-## Data Model
+El backend sigue el patrón:
 
-The system is based on four core entities:
-
-### User
-
-* Authentication and ownership
-* One user → many opportunities & activities
-
-### Customer
-
-* Stores client information
-
-### Opportunity
-
-* Represents a sales deal
-* Linked to a customer
-
-### Activity
-
-* Represents interactions (call, meeting, task)
-* Linked to a customer or opportunity
-
----
-
-## Relationships
-
-```
-User
- ├── Opportunities
- └── Activities
-
-Customer
- ├── Opportunities
- └── Activities
-
-Opportunity
- └── Activities
+```text
+Controller -> Service -> Repository -> Database
 ```
 
----
+- Controllers: reciben requests, validan dependencias y delegan.
+- Services: contienen reglas de negocio, ownership y transiciones.
+- Repositories: encapsulan queries y persistencia.
+- Schemas: validan entrada y salida HTTP.
+- Models: definen tablas SQLAlchemy.
 
-## Features
+## Variables De Entorno
 
-### Customer Management
+Backend (`.env` en la raíz):
 
-* Create, read, update, delete customers
-
-### Opportunity Management
-
-* Create opportunities linked to customers
-* Track status (Lead, Contacted, Proposal, Won, Lost)
-
-### Activity Management
-
-* Create activities linked to customers or opportunities
-* Track interactions and follow-ups
-
-### Authentication
-
-* User registration and login
-* JWT-based authorization
-* Protected routes
-
----
-
-## Security
-
-* Each user can only access their own data
-* Ownership validation enforced at service layer
-* Protected endpoints via JWT authentication
-
----
-
-## Testing
-
-The project includes **integration tests** using Pytest.
-
-### Covered scenarios:
-
-* User authentication
-* Resource ownership validation
-* CRUD operations
-* Access restrictions between users
-
----
-
-## Project Structure
-
-```
-app/
-├── controllers/
-├── services/
-├── repositories/
-├── models/
-├── schemas/
-├── enums/
-├── core/
-└── db/
+```env
+DATABASE_URL=sqlite:///./crm.db
+SECRET_KEY=change-me
+CORS_ORIGINS=http://localhost:5173
+# CORS_ORIGIN_REGEX=^https://(project-crm-[a-z0-9-]+|project-[a-z0-9-]+-kuro-nacho-ramiro)\.vercel\.app$
+ENV=development
 ```
 
----
+Notas:
 
-## API Endpoints (Summary)
+- Si `DATABASE_URL` no está definido, usa `sqlite:///./crm.db`.
+- En producción, `SECRET_KEY` debe estar definido.
+- `CORS_ORIGINS` acepta varios origins separados por coma.
+- `CORS_ORIGIN_REGEX` permite habilitar previews de Vercel sin usar `*`.
+- `SKIP_CREATE_ALL=1` desactiva `Base.metadata.create_all()` al importar `app.main`.
 
-### Customers
+Frontend (`crm-frontend/.env`):
 
-* `POST /customers`
-* `GET /customers`
-* `GET /customers/{id}`
-* `PUT /customers/{id}`
-* `DELETE /customers/{id}`
-
-### Opportunities
-
-* `POST /opportunities`
-* `GET /opportunities`
-* `PUT /opportunities/{id}`
-* `DELETE /opportunities/{id}`
-
-### Activities
-
-* `POST /activities`
-* `GET /activities`
-* `PUT /activities/{id}`
-* `DELETE /activities/{id}`
-
----
-
-## How to Run Locally
-
-### 1. Clone the repository
-
-```bash
-git clone <your-repo-url>
-cd CRM
+```env
+VITE_API_URL=http://localhost:8000
 ```
 
-### 2. Create virtual environment
+Hay un ejemplo en `crm-frontend/.env.example`.
+
+## Ejecutar Backend
+
+Desde la raíz del repo:
 
 ```bash
 python -m venv venv
-venv\Scripts\activate   # Windows
-```
-
-### 3. Install dependencies
-
-```bash
+venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-### 4. Configure environment variables
-
-Create a `.env` file:
-
-```env
-DATABASE_URL=your_database_url
-SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-```
-
-### 5. Run the server
-
-```bash
 uvicorn app.main:app --reload
 ```
 
-### 6. Access API docs
+API docs:
 
-```
+```text
 http://localhost:8000/docs
 ```
 
----
+## Ejecutar Frontend
 
-## Future Improvements
+Desde `crm-frontend/`:
 
-* Role-based access control (RBAC)
-* Notifications and reminders
-* Reporting and analytics
-* Frontend integration (React)
-* Dockerization and deployment
+```bash
+npm install
+npm run dev
+```
 
----
+Frontend local:
 
-## Conclusion
+```text
+http://localhost:5173
+```
 
-This project demonstrates:
+## Verificación
 
-* Clean backend architecture
-* Real-world business logic implementation
-* Secure multi-user system
-* Test-driven development practices
+Backend, desde la raíz:
 
-It is designed as both:
+```bash
+pytest -q
+```
 
-* A functional CRM MVP
-* A professional backend portfolio project
+Frontend, desde `crm-frontend/`:
 
----
+```bash
+npm run lint
+npm run build
+```
+
+Estado actual verificado:
+
+- `pytest -q`: pasa.
+- `npm run lint`: pasa.
+- `npm run build`: pasa con warning de chunk grande de Vite.
+
+## Endpoints Principales
+
+Auth:
+
+- `POST /auth/register`
+- `POST /auth/login`
+
+Customers:
+
+- `POST /customers/`
+- `GET /customers/`
+- `GET /customers/{customer_id}`
+- `PUT /customers/{customer_id}`
+- `DELETE /customers/{customer_id}`
+
+Opportunities:
+
+- `POST /opportunities/`
+- `GET /opportunities/`
+- `GET /opportunities/{opportunity_id}`
+- `PUT /opportunities/{opportunity_id}`
+- `PATCH /opportunities/{opportunity_id}/status`
+- `DELETE /opportunities/{opportunity_id}`
+
+Activities:
+
+- `POST /activities/`
+- `GET /activities/`
+- `GET /activities/{activity_id}`
+- `GET /activities/customer/{customer_id}`
+- `GET /activities/opportunity/{opportunity_id}`
+- `PUT /activities/{activity_id}`
+- `PATCH /activities/{activity_id}/status`
+- `DELETE /activities/{activity_id}`
+
+## Notas De Desarrollo
+
+- Las rutas de colección usan trailing slash: `/customers/`, `/opportunities/`, `/activities/`.
+- El token JWT se guarda en `localStorage` con la clave `token`.
+- El frontend redirige a `/login` cuando una respuesta API devuelve `401`.
+- Importar `app.main` puede crear tablas si `SKIP_CREATE_ALL` no está activo.
+- El archivo `crm.db` es local de desarrollo y puede cambiar al correr tests o servidor con SQLite.
+
+## Roadmap Próximo
+
+- Mejorar responsive y accesibilidad de modales/tablas.
+- Añadir fixtures de test con base aislada.
+- Añadir manejo visual de errores en frontend en lugar de `alert`/`confirm`.
+- Añadir paginación/filtros para clientes, oportunidades y actividades.
+
+## Producción
+
+Stack recomendado sin costo inicial:
+
+- Frontend: Vercel o Netlify.
+- Backend: Render o Koyeb.
+- Base de datos: Supabase PostgreSQL.
+
+Variables de entorno del backend:
+
+```env
+ENV=production
+DATABASE_URL=postgresql://postgres:<password>@db.sidahfffffhvtahdtajp.supabase.co:5432/postgres
+SECRET_KEY=<strong-random-secret>
+CORS_ORIGINS=https://project-crm.vercel.app
+CORS_ORIGIN_REGEX=^https://(project-crm-[a-z0-9-]+|project-[a-z0-9-]+-kuro-nacho-ramiro)\.vercel\.app$
+SKIP_CREATE_ALL=1
+```
+
+Variables de entorno del frontend:
+
+```env
+VITE_API_URL=https://project-crm-api.onrender.com
+```
+
+El comando de arranque de producción ejecuta las migraciones antes de levantar la API:
+
+```bash
+alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+El endpoint `GET /health` permite validar que la API este activa.
