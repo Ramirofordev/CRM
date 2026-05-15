@@ -13,7 +13,7 @@ class Activity(Base):
     description = Column(String, nullable = True)
 
     type = Column(Enum(ActivityType), nullable = False, default = ActivityType.CALL)
-    status = Column(Enum(ActivityStatus), default = ActivityStatus.PENDING)
+    status = Column(Enum(ActivityStatus), nullable = False, default = ActivityStatus.PENDING)
 
     due_date = Column(DateTime, nullable = True)
 

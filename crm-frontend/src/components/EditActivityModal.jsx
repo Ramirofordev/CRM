@@ -31,8 +31,18 @@ export default function EditActivityModal({ activity, onClose, onUpdated }) {
         if (!form.customer_id && !form.opportunity_id) return alert("La actividad debe estar conectad a un cliente o oportunidad");
         if (form.customer_id && form.opportunity_id) return alert("La actividad no puede estar conectada a una oportunidad y a un cliente");
 
+        const payload = {
+            title: form.title,
+            description: form.description || null,
+            due_date: dueDate ? new Date(dueDate).toISOString(): null,
+            ...(form.status ? { status: form.status } : {}),
+            ...(form.type ? { type: form.type } : {}),
+            ...(form.customer_id ? { customer_id: form.customer_id } : {}),
+            ...(form.opportunity_id ? { opportunity_id: form.opportunity_id } : {}),
+        };
+
         try {
-            await activitiesApi.update(activity.id, { ...form, due_date: dueDate ? new Date(dueDate).toISOString(): null });
+            await activitiesApi.update(activity.id, payload);
             onUpdated();
             onClose();
         } catch (err) {

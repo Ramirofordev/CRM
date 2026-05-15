@@ -28,7 +28,7 @@ def create_activity(db: Session, data, user):
     
         check_ownership(opportunity, user)
         
-    data_dict = data.model_dump()
+    data_dict = data.model_dump(exclude_none = True)
     data_dict["owner_id"] = user.id
         
     return activity_repository.create_activity(db, data_dict)

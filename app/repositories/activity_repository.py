@@ -26,6 +26,8 @@ def get_by_owner(db: Session, owner_id: str):
 
 def update_activity(db: Session, activity, data):
     for key, value in data.model_dump().items():
+        if key in {"status", "type"} and value is None:
+            continue
         setattr(activity, key, value)
 
     db.commit()

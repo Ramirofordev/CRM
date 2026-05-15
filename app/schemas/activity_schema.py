@@ -7,7 +7,7 @@ from app.enum.activity_enum import ActivityType, ActivityStatus
 class ActivityCreate(BaseModel):
     title: str
     description: Optional[str] = None
-    status: ActivityStatus | None = None
+    status: ActivityStatus | None = ActivityStatus.PENDING
     type: ActivityType | None = ActivityType.CALL
     due_date: Optional[datetime] = None
 

@@ -31,8 +31,17 @@ export default function CreateActivityModal({ onClose, onCreated }) {
         if (!form.opportunity_id && !form.customer_id) return alert("La actividad debe estar conectada a una oportunidad o cliente")
         if (form.opportunity_id && form.customer_id) return alert("La actividad no puede estar conectada a una oportunidad y a un cliente")
 
+        const payload = {
+            title: form.title,
+            description: form.description || null,
+            due_date: dueDate ? new Date(dueDate).toISOString(): null,
+            ...(form.type ? { type: form.type } : {}),
+            ...(form.customer_id ? { customer_id: form.customer_id } : {}),
+            ...(form.opportunity_id ? { opportunity_id: form.opportunity_id } : {}),
+        };
+
         try {
-            await activitiesApi.create({ ...form, due_date: dueDate ? new Date(dueDate).toISOString(): null });
+            await activitiesApi.create(payload);
             onCreated();
             onClose();
         } catch(err) {
